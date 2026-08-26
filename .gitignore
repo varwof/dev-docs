@@ -1,0 +1,6 @@
+# Internal analysis notes (not for publication)
+aic-analyze/
+
+# Misc
+.DS_Store
+*.db
