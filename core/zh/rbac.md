@@ -29,6 +29,14 @@ varwof PKI 实现了基于角色的访问控制（RBAC）系统，包含两种�
 - 非证书认证（token/basic/cookie）：始终分配 "operator" 角色
 - AIC 证书：`权限 = PA 授权 ∩ AIC 能力`
 
+**账号的硬限制（审计要点）**：
+- 服务端解析（`resolveBasicAuth` / `resolveAPIToken`）结果固定为 `Role:"operator"`；
+  即使账户在 `rbac_users.role` 被配置为 `superadmin`，DB 角色字段也**不参与授权**。
+- 作用域不随账号注入，仅从绑定的操作员证书（SAN/OID）派生。
+- 因此 **superadmin 只能通过 mTLS 管理证书获得**；用户名+密码永远无法到达
+  superadmin 级能力（管理签发、superadmin 专属端点均返回 403）。
+- 密码的合法用途仅限：身份归属、审计线索、操作员证书绑定匹配。
+
 ## 角色
 
 ### 核心角色
@@ -45,6 +53,18 @@ varwof PKI 实现了基于角色的访问控制（RBAC）系统，包含两种�
 | `auto-renew` | `m-auto-renew` | — | 仅证书续期 |
 | `reporter` | `m-reporter` | — | 报告生成和导出 |
 | `agent` | `agent-proxy` | — | 具有网关能力的 AI 代理 |
+
+### 管理子 CA 硬排除
+
+签发管理（`m-*`）证书（`POST /api/v1/certs`，profile=`m-*`）：
+
+- 要求 mTLS 客户端证书**在场**（`TLS.PeerCertificates` 为空 → `401 api.auth_required`）
+- 角色必须为 `superadmin`（否则 → `403 api.management_mint_denied`）
+- **operator 及所有其他角色一律硬排除**于管理子 CA；operator 的原管理签发能力标记废弃（planned removal）
+- 证书作用域由 CA 侧 `scope` 参数写入（非请求方自报）
+
+> 安全模型与完整验证数据（378×2 矩阵 + P0 断言）见 core 仓库
+> `docs/security/rbac-security-model.md` 与 `docs/security/rbac-verification-2026-08-28.md`。
 
 ### 网关角色（命名空间 `gateway:`）
 

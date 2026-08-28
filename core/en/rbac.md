@@ -29,6 +29,18 @@ Every request is authenticated via one of these methods (in priority order):
 - Non-certificate auth (token/basic/cookie): Always assigned "operator" role
 - AIC certificates: `Permissions = PA grants ∩ AIC capabilities`
 
+**Hard limits of accounts (audit-relevant)**:
+- Server-side resolvers (`resolveBasicAuth` / `resolveAPIToken`) always yield
+  `Role: "operator"`; even if `rbac_users.role` is configured as `superadmin`,
+  the DB role column **does not participate in authorization**.
+- Scope is not injected by the account; it is derived only from the bound
+  operator certificate (SAN/OID).
+- Therefore **superadmin is only ever reached via an mTLS management certificate**;
+  username+password can never reach a superadmin-level capability (management
+  mint and superadmin-only endpoints both return 403).
+- Passwords are valid only for: identity attribution, audit trail, and
+  operator-certificate binding matching.
+
 ## Roles
 
 ### Core Roles
@@ -45,6 +57,21 @@ Every request is authenticated via one of these methods (in priority order):
 | `auto-renew` | `m-auto-renew` | — | Certificate renewal only |
 | `reporter` | `m-reporter` | — | Report generation and export |
 | `agent` | `agent-proxy` | — | AI agent with gateway capabilities |
+
+### Management sub-CA hard exclusion
+
+Minting management (`m-*`) certificates (`POST /api/v1/certs`, profile=`m-*`):
+
+- Requires an mTLS client certificate **in hand** (empty `TLS.PeerCertificates`
+  → `401 api.auth_required`)
+- Role must be `superadmin` (otherwise → `403 api.management_mint_denied`)
+- **operator and every other role are hard-excluded** from the management sub-CA;
+  the operator's legacy management-mint capability is deprecated (planned removal)
+- Certificate scope is written CA-side via the `scope` parameter (not requester-declared)
+
+> Security model and full verification data (378×2 matrix + P0 probes) live in
+> the `core` repo: `docs/security/rbac-security-model.md` and
+> `docs/security/rbac-verification-2026-08-28.md`.
 
 ### Gateway Roles (namespaced `gateway:`)
 
