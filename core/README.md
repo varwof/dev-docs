@@ -59,6 +59,8 @@ Developer / architecture documentation (this repo):
 | [PKI Architecture](en/pki-architecture.md) | PKI subsystem design |
 | [PKI Hierarchy](en/pki-hierarchy.md) | Setting up a full PKI hierarchy |
 | [RBAC](en/rbac.md) | Role-based access control model |
+| [Feature Overview](en/feature-overview.md) | Comprehensive feature documentation |
+| [RFC Deviations](en/rfc-deviations.md) | Known deviations from RFCs |
 
 Product / operations documentation (in the `core` repository):
 

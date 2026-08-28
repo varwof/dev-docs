@@ -6,6 +6,10 @@ Three-layer zero-trust security gateway unifying TCP/HTTP/UDP protocols with mTL
 **License**: Apache-2.0  
 **Status**: Preview
 
+> **Docs**: [End-to-End Zero-Trust Gateway Demo](en/end-to-end-demo.md)
+> ([中文演示](zh/end-to-end-demo.md)) · 中文版见
+> [README_CN.md](README_CN.md)
+
 ## Overview
 
 The varwof gateway provides three protocol-specific binaries:

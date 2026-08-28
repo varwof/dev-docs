@@ -6,6 +6,10 @@
 **许可证**：Apache-2.0
 **状态**：预览版
 
+> **文档**：[端到端零信任网关演示](zh/end-to-end-demo.md)
+> （[英文版](en/end-to-end-demo.md)）· 英文版见
+> [README.md](README.md)
+
 ## 概述
 
 varwof 网关提供三个协议特定的二进制程序：

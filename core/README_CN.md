@@ -62,6 +62,8 @@ pki serve --config pki.json
 | [PKI 层级](zh/pki-hierarchy.md) | 设置完整的 PKI 层级 |
 | [PKI 架构](zh/pki-architecture.md) | PKI 子系统设计 |
 | [RBAC](zh/rbac.md) | 基于角色的访问控制模型 |
+| [功能全面文档](zh/feature-overview.md) | 功能特性详解 |
+| [RFC 已知偏差](zh/rfc-deviations.md) | 与 RFC 的已知偏差清单 |
 
 ## 项目结构
 
