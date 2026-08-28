@@ -3,6 +3,20 @@
 Developer documentation for the Varwof zero-trust PKI and AI agent
 identity (AIC) stack.
 
+## Platform Documentation
+
+Developer / architecture documentation for the Varwof platform components
+(documentation lives here; the product / operations docs ship with each repo):
+
+- [Varwof Core](core/README.md) — PKI infrastructure: architecture,
+  PKI architecture, PKI hierarchy, RBAC model
+  ([中文版](core/README_CN.md); per-document translations in
+  [`core/en/`](core/en/) and [`core/zh/`](core/zh/))
+- [Varwof Client](client/README.md) — CLI management client for the core CA
+  API ([中文版](client/README_CN.md))
+- [Varwof Gateway](gateway/README.md) — three-layer zero-trust security
+  gateway for TCP/HTTP/UDP ([中文版](gateway/README_CN.md))
+
 ## AIC Specification
 
 The AIC (Agent Identity Certificate) specification — an X.509
