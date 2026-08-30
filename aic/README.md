@@ -104,13 +104,16 @@ IANA PEN 66257, officially approved in July 2026.
 │   │   │   ├── 1  chainDepth      ── Current delegation level
 │   │   │   └── 2  maxDepth        ── Maximum allowed delegation depth
 │   │
-│   ├── 2  PrincipalAuthorization  ── Principal authorization declaration
-│   │   └── 4  DelegationPolicy    ── Delegation boundary
+│   ├── 2  PrincipalAuthorization  ── Principal authorization declaration; delegationPolicy is an ASN.1 field inside the extension, NOT a sub-OID
 │   │
-│   ├── 3  Capability Scheme Registry  ── (Reserved) Scheme registration space
-│   ├── 4  Vendor Extension Registry   ── (Reserved) Vendor extension index
-│   ├── 5  GatewaySession (historical) ── Pre-v1.5 gateway session extension (migrated to AIC.authorizationConstraints); sub-CA scope .1.5.1 still in use
+│   ├── 3  OfflineRBAC            ── Removed (2026-08): value .1.3, no production caller
+│   ├── 4  PrincipalProfile       ── Removed (2026-08): value .1.4, no production caller
+│   ├── 5  GatewaySession (historical) ── Pre-v1.5 gateway session extension (migrated to AIC.authorizationConstraints); branch kept for gateway-related sub-OIDs
+│   │   └── 1  Sub-CA scope       ── Active: sub-CA scope .1.5.1, in production use
 │   └── 6  RenewalToken            ── (Reserved) Authorization renewal token
+│
+├── 2  ASN.1 Module Identifiers
+│   └── 1  id-mod-varwof-aic       ── ASN.1 module arc { 1 3 6 1 4 1 66257 2 1 } (I-D §1.3)
 │
 ├── 3  National/Industry Certifications
 │   ├── 1  MarketAccessId          ── Market access container
@@ -139,11 +142,12 @@ IANA PEN 66257, officially approved in July 2026.
 | `.1.1.4.1` | chainDepth | DDC child node (FUTURE) |
 | `.1.1.4.2` | maxDepth | DDC child node (FUTURE) |
 | `.1.2` | PrincipalAuthorization | X.509 Extension |
-| `.1.2.4` | DelegationPolicy | P.A. child node |
-| `.1.3` | Capability Scheme Registry | Scheme registration space (reserved) |
-| `.1.4` | Vendor Extension Registry | Vendor extension index (reserved) |
-| `.1.5` | GatewaySession | Historical gateway session extension (sub-CA scope .1.5.1 still in use) |
+| `.1.3` | OfflineRBAC | Removed: no production caller |
+| `.1.4` | PrincipalProfile | Removed: no production caller |
+| `.1.5` | GatewaySession | Historical gateway session extension (sub-CA scope .1.5.1 in production use) |
+| `.1.5.1` | Sub-CA scope | CA scope extension (active) |
 | `.1.6` | RenewalToken | Authorization renewal token |
+| `.2.1` | id-mod-varwof-aic | ASN.1 module identifier (I-D §1.3) |
 | `.3.1` | MarketAccessId | National certification extension |
 | `.3.2` | TrustLevel | Trust level |
 | `.5.1` | SM2-Signature | Chinese cryptography algorithm |

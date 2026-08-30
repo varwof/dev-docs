@@ -131,10 +131,11 @@ Supports two forms: inline table and external resolver:
 
 | OID | Name |
 |:---:|------|
-| `.1.1.1` | AgentIdentity |
-| `.1.1.2` | DelegationAuthorization |
 | `.1.2` | PrincipalAuthorization |
 | `.3.1` | MarketAccessId |
+
+`.1.1.1` AgentIdentity and `.1.1.2` DelegationAuthorization are embedded fields of the AIC
+extension itself (not standalone extensions), so they are intentionally absent from this list.
 
 Other OIDs with `critical=true` will cause rejection.
 

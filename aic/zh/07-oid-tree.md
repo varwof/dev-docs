@@ -12,18 +12,23 @@
 │
 ├── 1  身份与权限核心 (Core Identity & Authorization)
 │   ├── 1  AIC  ── Agent 身份证书扩展
-│   │   ├── 1  AgentIdentity       ── 占用：AIC 主扩展（agentId, principalUid, delegationMode）
-│   │   ├── 2  DelegationAuthorization ── 占用：主体签名证据（.1.1.2；代码常量 OIDAICDelegationAuthorization，v1.7.2 由旧名 UserAuth 统一）
+│   │   ├── 1  AgentIdentity       ── 保留子节点（内嵌字段：agentId, principalUid, delegationMode；非独立扩展，不在 isKnownExtension）
+│   │   ├── 2  DelegationAuthorization ── 保留子节点（内嵌签名证据 .1.1.2；代码常量 OIDAICDelegationAuthorization，v1.7.2 由旧名 UserAuth 统一；非独立扩展，不在 isKnownExtension）
 │   │   └── 4  DelegationDepthControl  ── (FUTURE) 委托深度控制
 │   │       ├── 1  chainDepth      ── 当前委托层级
 │   │       └── 2  maxDepth        ── 最大允许委托深度
 │   │
-│   ├── 2  PrincipalAuthorization  ── 占用：主体授权声明（v1.5 起，由 .1.5 迁移）
-│   │   └── 4  DelegationPolicy    ── 委托边界
-│   ├── 3  Capability Scheme Registry ── (预留) Scheme 注册空间（槽位复用：v1.5 前 OfflineRBAC）
-│   ├── 4  Vendor Extension Registry  ── (预留) 厂商扩展索引（槽位复用：v1.5 前 PrincipalProfile）
-│   ├── 5  GatewaySession (historical) ── v1.5 前网关会话扩展（已迁移至 AIC.authorizationConstraints）；子 CA scope 扩展 .1.5.1 仍在用
+│   ├── 2  PrincipalAuthorization  ── 占用：主体授权声明（v1.5 起，由 .1.5 迁移）；
+│   │       delegationPolicy 是扩展内的 ASN.1 字段（[1] EXPLICIT），不是子 OID，无 .1.2.4
+│   ├── 3  OfflineRBAC            ── 已删除（2026-08）：gateway-core 离线 RBAC 扩展，值 .1.3，无生产调用（见第三节）
+│   ├── 4  PrincipalProfile       ── 已删除（2026-08）：gateway-core 身份档案扩展，值 .1.4，无生产调用（见第三节）
+│   ├── 5  GatewaySession (historical) ── v1.5 前网关会话扩展（已迁移至 AIC.authorizationConstraints）；
+│   │       保留该分支用于后续 gateway 相关子 OID（如下方子 CA scope）
+│   │   └── 1  子 CA scope         ── 在用：子 CA 作用域扩展 .1.5.1，生产使用中（core sign/sub 校验）
 │   └── 6  RenewalToken            ── (预留) 授权续期令牌
+│
+├── 2  ASN.1 模块标识
+│   └── 1  id-mod-varwof-aic       ── ASN.1 模块弧 { 1 3 6 1 4 1 66257 2 1 }（I-D §1.3）
 │
 ├── 3  国家/行业认证（v1.7.2 清理，后续另行规划）
 │   ├── 1  MarketAccessId          ── 市场准入容器（完整凭证）

@@ -12,18 +12,23 @@
 │
 ├── 1  Core Identity & Authorization
 │   ├── 1  AIC  ── Agent identity certificate extension
-│   │   ├── 1  AgentIdentity       ── Occupied: AIC main extension (agentId, principalUid, delegationMode)
-│   │   ├── 2  DelegationAuthorization ── Occupied: Principal signature evidence (.1.1.2; code constant OIDAICDelegationAuthorization, unified from old name UserAuth in v1.7.2)
+│   │   ├── 1  AgentIdentity       ── Reserved sub-node (embedded fields: agentId, principalUid, delegationMode; not a standalone extension, absent from isKnownExtension)
+│   │   ├── 2  DelegationAuthorization ── Reserved sub-node (embedded signature evidence .1.1.2; code constant OIDAICDelegationAuthorization, unified from old name UserAuth in v1.7.2; not a standalone extension, absent from isKnownExtension)
 │   │   └── 4  DelegationDepthControl  ── (FUTURE) Delegation depth control
 │   │       ├── 1  chainDepth      ── Current delegation level
 │   │       └── 2  maxDepth        ── Maximum allowed delegation depth
 │   │
-│   ├── 2  PrincipalAuthorization  ── Occupied: Principal authorization declaration (from v1.5, migrated from .1.5)
-│   │   └── 4  DelegationPolicy    ── Delegation boundary
-│   ├── 3  Capability Scheme Registry ── (Reserved) Scheme registration space (slot reuse: pre-v1.5 OfflineRBAC)
-│   ├── 4  Vendor Extension Registry  ── (Reserved) Vendor extension index (slot reuse: pre-v1.5 PrincipalProfile)
-│   ├── 5  GatewaySession (historical) ── Pre-v1.5 gateway session extension (migrated to AIC.authorizationConstraints); sub-CA scope extension .1.5.1 still in use
+│   ├── 2  PrincipalAuthorization  ── Occupied: Principal authorization declaration (from v1.5, migrated from .1.5);
+│   │       delegationPolicy is an ASN.1 field inside the extension ([1] EXPLICIT, forbidden in OID terms), NOT a sub-OID
+│   ├── 3  OfflineRBAC            ── Removed (2026-08): gateway-core offline RBAC extension, value .1.3, no production caller (see Section III)
+│   ├── 4  PrincipalProfile       ── Removed (2026-08): gateway-core principal profile extension, value .1.4, no production caller (see Section III)
+│   ├── 5  GatewaySession (historical) ── Pre-v1.5 gateway session extension (migrated to AIC.authorizationConstraints);
+│   │       branch kept for gateway-related sub-OIDs (e.g. sub-CA scope below)
+│   │   └── 1  Sub-CA scope        ── Active: sub-CA scope extension .1.5.1, in production use (core sign/sub verify)
 │   └── 6  RenewalToken            ── (Reserved) Authorization renewal token
+│
+├── 2  ASN.1 Module Identifiers
+│   └── 1  id-mod-varwof-aic       ── ASN.1 module arc { 1 3 6 1 4 1 66257 2 1 } (I-D §1.3)
 │
 ├── 3  National/Industry Certifications (v1.7.2 cleanup, further planning TBD)
 │   ├── 1  MarketAccessId          ── Market access container (complete credential)
@@ -56,8 +61,8 @@
 
 | Slot | Name | Status |
 |:---:|------|--------|
-| .1.1.1 | AgentIdentity | Occupied |
-| .1.1.2 | DelegationAuthorization | Occupied |
+| .1.1.1 | AgentIdentity | Reserved sub-node (embedded in AIC, not standalone) |
+| .1.1.2 | DelegationAuthorization | Reserved sub-node (embedded in AIC, not standalone) |
 | .1.1.3 | — | Free (unallocated) |
 | .1.1.4 | DelegationDepthControl | (FUTURE) Specification reserve, not yet implemented |
 | .1.1.5 | UserExtensions | Removed (v1.5) |

@@ -131,10 +131,10 @@ PA 约束**独立于** AIC 约束执行：直接访问（无 AIC）时 PA 约束
 
 | OID | 名称 |
 |:---:|------|
-| `.1.1.1` | AgentIdentity |
-| `.1.1.2` | DelegationAuthorization |
 | `.1.2` | PrincipalAuthorization |
 | `.3.1` | MarketAccessId |
+
+`.1.1.1` AgentIdentity 与 `.1.1.2` DelegationAuthorization 是 AIC 扩展自身的内嵌字段（非独立扩展），故有意不列入此表。
 
 其他 OID 且 `critical=true` 将导致拒绝。
 

@@ -104,13 +104,16 @@ IANA PEN 66257，已于 2026 年 7 月正式批复。
 │   │   │   ├── 1  chainDepth      ── 当前委托层级
 │   │   │   └── 2  maxDepth        ── 最大允许委托深度
 │   │
-│   ├── 2  PrincipalAuthorization  ── 主体授权声明
-│   │   └── 4  DelegationPolicy    ── 委托边界
+│   ├── 2  PrincipalAuthorization  ── 主体授权声明；delegationPolicy 是扩展内 ASN.1 字段，非子 OID
 │   │
-│   ├── 3  Capability Scheme Registry  ── (预留) Scheme 注册空间
-│   ├── 4  Vendor Extension Registry   ── (预留) 厂商扩展索引
-│   ├── 5  GatewaySession (historical) ── v1.5 前网关会话扩展（已迁移至 AIC.authorizationConstraints）；子 CA scope .1.5.1 仍在用
+│   ├── 3  OfflineRBAC            ── 已删除（2026-08）：值 .1.3，无生产调用
+│   ├── 4  PrincipalProfile       ── 已删除（2026-08）：值 .1.4，无生产调用
+│   ├── 5  GatewaySession (historical) ── v1.5 前网关会话扩展（已迁移至 AIC.authorizationConstraints）；保留分支用于 gateway 相关子 OID
+│   │   └── 1  子 CA scope        ── 在用：子 CA 作用域 .1.5.1，生产使用中
 │   └── 6  RenewalToken            ── (预留) 授权续期令牌
+│
+├── 2  ASN.1 模块标识
+│   └── 1  id-mod-varwof-aic       ── ASN.1 模块弧 { 1 3 6 1 4 1 66257 2 1 }（I-D §1.3）
 │
 ├── 3  国家/行业认证
 │   ├── 1  MarketAccessId          ── 市场准入容器
@@ -139,11 +142,12 @@ IANA PEN 66257，已于 2026 年 7 月正式批复。
 | `.1.1.4.1` | chainDepth | DDC 子节点（FUTURE） |
 | `.1.1.4.2` | maxDepth | DDC 子节点（FUTURE） |
 | `.1.2` | PrincipalAuthorization | X.509 扩展 |
-| `.1.2.4` | DelegationPolicy | P.A. 子节点 |
-| `.1.3` | Capability Scheme Registry | Scheme 注册空间（预留） |
-| `.1.4` | Vendor Extension Registry | 厂商扩展索引（预留） |
-| `.1.5` | GatewaySession | 历史网关会话扩展（子 CA scope .1.5.1 仍在用） |
+| `.1.3` | OfflineRBAC | 已删除：无生产调用 |
+| `.1.4` | PrincipalProfile | 已删除：无生产调用 |
+| `.1.5` | GatewaySession | 历史网关会话扩展（子 CA scope .1.5.1 生产使用中） |
+| `.1.5.1` | 子 CA scope | CA 作用域扩展（在用） |
 | `.1.6` | RenewalToken | 授权续期令牌 |
+| `.2.1` | id-mod-varwof-aic | ASN.1 模块标识（I-D §1.3） |
 | `.3.1` | MarketAccessId | 国家认证扩展 |
 | `.3.2` | TrustLevel | 信任等级 |
 | `.5.1` | SM2-Signature | 国密算法 |
