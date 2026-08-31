@@ -69,7 +69,7 @@ AIC（Agent Identity Certificate）是一套基于 X.509 v3 证书扩展的 AI A
 | 文件 | 内容 | 状态 |
 |------|------|------|
 | [08-dual-cert.md](zh/08-dual-cert.md) | 双证书部署方案（握手证书 + 授权证书，绕过 QUIC 16KB 限制） | FUTURE |
-| [09-aic-iam-unification.md](zh/09-aic-iam-unification.md) | AIC × IAM 统一身份（双形态：X.509 + JWT） | 🟡 部分实现 |
+| [09-aic-iam-unification.md](zh/09-aic-iam-unification.md) | AIC × IAM 统一身份（双形态：X.509 + JWT） | ✅ L0–L4 已实现（2026-08-31） |
 | [10-enterprise-authz.md](zh/10-enterprise-authz.md) | 企业权限自治（PrincipalAuthorization + authz.json） | 🟡 部分实现 |
 | [11-spiffe-oauth.md](zh/11-spiffe-oauth.md) | AIC × SPIFFE × OAuth/OIDC 互操作规范 | ⚠️ 暂缓 |
 | [12-identity-source.md](zh/12-identity-source.md) | LDAP/AD 身份来源整合（bridge-ldap/bridge-oauth） | ⚠️ 暂缓 |

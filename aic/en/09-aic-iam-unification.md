@@ -1,8 +1,9 @@
 # AIC × IAM Unification: Dual-Form Identity Design
 
-> Status: 🟡 Core partially landed (2026-08-24): Dual-form identity already implemented by AIC-JWT (`draft-wei-aic-jwt-00`) + `types/aicjwt`;
-> **FUTURE**: `/api/v1/token` (AIC→JWT exchange), `/.well-known/jwks.json`, `/.well-known/openid-configuration`, policy point API, multi-language thin SDK
-> Date: 2026-08-01 (updated 2026-08-24)
+> Status: ✅ **Dual carrier implemented (2026-08-31)**: X.509 and AIC-JWT share the same trust root; core L0–L4 all landed —
+> `/.well-known/jwks.json` (L0), `ca.SignJWT` (L1), Bearer validation + RBAC (L2), `/oauth/token` (L3, RFC 8693/7523/9068), dual-carrier end-to-end matrix (L4)
+> Pending: `/.well-known/openid-configuration`, policy point API, multi-language thin SDK (see `aic-jwt-repo-matrix.md`)
+> Date: 2026-08-01 (updated 2026-08-31)
 > Topic: AIC as the sole IAM identity source, any mainstream language, any form of App (native/server-side/Web) natively connected
 
 ## 0. One Sentence
@@ -47,7 +48,7 @@ Web is the only scenario where client certificates cannot be obtained, so there 
 Web App / Any Language App
    │  ① Holds AIC certificate (mTLS or via gateway)
    ▼
-Core  POST /api/v1/token    ← Exchange AIC for short-lived JWT (JWKS signed)
+Core  POST /oauth/token      ← Exchange AIC for short-lived JWT (JWKS signed, RFC 8693)
    │  ② Returns JWT: { sub=principal_uid, agent_id, scopes=capabilities,
    │                exp=min(certificate validity, ExecutionConstraints), ... }
    ▼
@@ -79,7 +80,7 @@ the trust model. This also explains why B2 (certificate pass-through) and `/sess
 
 ## 5. Implementation Path (Language-Agnostic, Protocol First, SDK Later)
 
-- **P0 Protocol Layer**: `/api/v1/token` (certificate→JWT) + `GET /jwks` + standard claim mapping table. Once this
+- **P0 Protocol Layer (✅ landed 2026-08-31)**: `/oauth/token` (certificate→JWT, RFC 8693/7523/9068) + `/.well-known/jwks.json` (kid = CA SPKI hash) + standard claim mapping table. Once this
   interface is defined, any language can connect directly, **no need to wait for SDK**
 - **P1 Reference Implementation**: Write a "thin" reference SDK for 2-3 mainstream languages (verification + claims extraction + local
   authorization helper) to prove protocol completeness; other languages implement per protocol
@@ -103,4 +104,5 @@ the trust model. This also explains why B2 (certificate pass-through) and `/sess
 - Ready: B2 certificate pass-through (`X-Client-Cert-DER` + structured headers), `/api/v1/session` identity detection,
   AIC parsing (`internal/ca` + pki-gateway-lib), JWT capability (OIDC provisioner already has pure
   stdlib JWT verification, reusable for issuance)
-- To build: `/api/v1/token` (certificate→JWT), `/jwks`, claim mapping table, policy point API
+- **Done (2026-08-31, L0–L4)**: `/.well-known/jwks.json`, `ca.SignJWT`, Bearer validation + RBAC, `/oauth/token` (R8693 x509→JWT exchange / R7523 JWT-bearer / R9068 access tokens), DPoP/mTLS binding, dual-carrier coherence (mTLS key vs `cnf.jkt`)
+- To build: `/.well-known/openid-configuration`, policy point API, multi-language thin SDK (`@varwof/agent` TS, etc.)

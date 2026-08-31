@@ -69,7 +69,7 @@ AIC (Agent Identity Certificate) is an AI Agent identity and authorization frame
 | File | Content | Status |
 |------|---------|--------|
 | `08-dual-cert.md` | Dual-certificate deployment (handshake cert + authorization cert, bypassing QUIC 16KB limit) | FUTURE |
-| `09-aic-iam-unification.md` | AIC × IAM unified identity (dual-form: X.509 + JWT) | 🟡 Partial |
+| `09-aic-iam-unification.md` | AIC × IAM unified identity (dual-form: X.509 + JWT) | ✅ L0–L4 implemented (2026-08-31) |
 | `10-enterprise-authz.md` | Enterprise privilege autonomy (PrincipalAuthorization + authz.json) | 🟡 Partial |
 | `11-spiffe-oauth.md` | AIC × SPIFFE × OAuth/OIDC interoperability specification | ⚠️ Deferred |
 | `12-identity-source.md` | LDAP/AD identity source integration (bridge-ldap/bridge-oauth) | ⚠️ Deferred |

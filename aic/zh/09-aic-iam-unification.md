@@ -1,8 +1,9 @@
 # AIC × IAM Unification: Dual-Form Identity Design
 
-> 状态：🟡 核心已部分落地（2026-08-24）：双形态身份已由 AIC-JWT（`draft-wei-aic-jwt-00`）+ `types/aicjwt` 实现；
-> **FUTURE**：`/api/v1/token`（AIC→JWT 交换）、`/.well-known/jwks.json`、`/.well-known/openid-configuration`、策略点接口、多语言薄 SDK
-> 日期：2026-08-01（更新 2026-08-24）
+> 状态：✅ **双载体已实现（2026-08-31）**：X.509 与 AIC-JWT 共享同一信任根，core L0–L4 全部落地——
+> `/.well-known/jwks.json`（L0）、`ca.SignJWT`（L1）、Bearer 校验 + RBAC（L2）、`/oauth/token`（L3，RFC 8693/7523/9068）、双载体端到端矩阵（L4）
+> 待办：`/.well-known/openid-configuration`、策略点接口、多语言薄 SDK（见 `aic-jwt-repo-matrix.md`）
+> 日期：2026-08-01（更新 2026-08-31）
 > 主题：AIC 作为 IAM 唯一身份源，任意主流语言、任意形态 App（原生/服务端/Web）原生接入
 
 ## 0. 一句话
@@ -51,7 +52,7 @@ Web 是唯一拿不到客户端证书的场景，所以必须有一个"用 AIC �
 Web App / 任意语言 App
    │  ① 持有 AIC 证书（mTLS 或经网关）
    ▼
-核心  POST /api/v1/token    ← 用 AIC 交换短期 JWT（JWKS 签名）
+核心  POST /oauth/token      ← 用 AIC 交换短期 JWT（JWKS 签名，RFC 8693）
    │  ② 返回 JWT: { sub=principal_uid, agent_id, scopes=capabilities,
    │                exp=min(证书有效期, ExecutionConstraints), ... }
    ▼
@@ -83,7 +84,7 @@ App）或 → 换发 JWT（给 Web/跨语言）。核心仍是唯一签发源，
 
 ## 5. 落地路径（语言无关，先协议后 SDK）
 
-- **P0 协议层**：`/api/v1/token`（证书→JWT）+ `GET /jwks` + 标准 claim 映射表。这套
+- **P0 协议层（✅ 2026-08-31 已落地）**：`/oauth/token`（证书→JWT，RFC 8693/7523/9068）+ `/.well-known/jwks.json`（kid = CA SPKI hash）+ 标准 claim 映射表。这套
   接口定下来，任何语言都能直接接，**不需要等 SDK**
 - **P1 参考实现**：给 2-3 种主流语言各写一个"薄"参考 SDK（验签 + claims 提取 + 本地
   授权助手），证明协议完备，其余语言按协议自实现
@@ -107,4 +108,5 @@ App）或 → 换发 JWT（给 Web/跨语言）。核心仍是唯一签发源，
 - 已就绪：B2 证书透传（`X-Client-Cert-DER` + 结构化头）、`/api/v1/session` 身份探测、
   AIC 解析（`internal/ca` + pki-gateway-lib）、JWT 能力（OIDC provisioner 已有纯
   stdlib JWT 验签，可复用做签发）
-- 待建：`/api/v1/token`（证书→JWT）、`/jwks`、claim 映射表、策略点接口
+- **已完成（2026-08-31，L0–L4）**：`/.well-known/jwks.json`、`ca.SignJWT`、Bearer 校验 + RBAC、`/oauth/token`（R8693 x509→JWT 兑换 / R7523 JWT-bearer / R9068 access token）、DPoP/mTLS 绑定、双载体一致性（mTLS key vs `cnf.jkt`）
+- 待建：`/.well-known/openid-configuration`、策略点接口、多语言薄 SDK（`@varwof/agent` TS 等）

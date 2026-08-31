@@ -111,4 +111,4 @@ core/
 
 ## 许可证
 
-AGPL-3.0
+AGPL-3.0 / 商业许可 — 见 https://varwof.com/pricing
