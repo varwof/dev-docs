@@ -398,7 +398,7 @@ varwof deploy --target k8s-secret --cert server.pem --key server.key \
 
 ### 2.22 `varwof report` — 合规报告生成
 
-生成 SOC 2、PCI DSS、NIST SP 800-53、ISO 27001 标准的审计合规报告 PDF。
+基于本地状态生成 SOC 2、PCI DSS、NIST SP 800-53、ISO 27001 模板的自评估合规报告 PDF。
 
 | 参数 | 说明 |
 |------|------|

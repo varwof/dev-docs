@@ -382,7 +382,7 @@ varwof deploy --target k8s-secret --cert server.pem --key server.key \
 
 ### 2.22 `varwof report` — Compliance Report Generation
 
-Generate audit-ready compliance report PDFs for SOC 2, PCI DSS, NIST SP 800-53, and ISO 27001 standards.
+Generate self-assessment compliance report PDFs from local state (SOC 2, PCI DSS, NIST SP 800-53, ISO 27001 templates).
 
 | Flag | Description |
 |------|-------------|

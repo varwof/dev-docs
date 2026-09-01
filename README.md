@@ -28,7 +28,7 @@ semantics:
   (English primary; [中文版](aic/README_CN.md); per-section
   translations in [`aic/en/`](aic/en/) and [`aic/zh/`](aic/zh/))
 - IETF drafts:
-  [`draft-wei-aic-identity-cert-00`](https://datatracker.ietf.org/doc/draft-wei-aic-identity-cert/)
+  [`draft-wei-aic-identity-cert-01`](https://datatracker.ietf.org/doc/draft-wei-aic-identity-cert/)
   and
   [`draft-wei-aic-jwt-00`](https://datatracker.ietf.org/doc/draft-wei-aic-jwt/)
 - IPR: Royalty-Free for all implementers (IETF IPR disclosures
