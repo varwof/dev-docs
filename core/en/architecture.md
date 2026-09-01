@@ -78,7 +78,7 @@ Middleware stack:
 
 Abstracted via `github.com/varwof/engine/db` interface. Supports:
 - **SQLite**: Zero-config, single-node (recommended for dev/small scale)
-- **PostgreSQL**: Multi-writer, production-grade
+- **PostgreSQL**: Multi-writer
 - **MySQL/MariaDB**: Multi-writer, MySQL ecosystem
 
 Schema migrations are applied automatically on startup.

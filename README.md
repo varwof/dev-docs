@@ -1,5 +1,8 @@
 # Varwof Developer Documentation
 
+> ⚠️ **Preview** — This documentation describes software in preview status.
+> Not for production use.
+
 Developer documentation for the Varwof zero-trust PKI and AI agent
 identity (AIC) stack.
 
