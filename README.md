@@ -1,5 +1,8 @@
 # Varwof Developer Documentation
 
+> ⭐ Like this repo? Give a star to the flagship one:
+> [![GitHub stars](https://img.shields.io/github/stars/varwof/core?style=social&label=varwof/core)](https://github.com/varwof/core)
+
 > ⚠️ **Preview** — This documentation describes software in preview status.
 > Not for production use.
 
