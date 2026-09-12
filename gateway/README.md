@@ -9,6 +9,10 @@ Three-layer zero-trust security gateway unifying TCP/HTTP/UDP protocols with mTL
 > **Docs**: [End-to-End Zero-Trust Gateway Demo](en/end-to-end-demo.md)
 > ([中文演示](zh/end-to-end-demo.md)) · 中文版见
 > [README_CN.md](README_CN.md)
+>
+> **Technical references** (EN):
+> - [gateway-core — shared security engine](en/gateway-core-technical.md)
+> - [gateway — the three protocol binaries](en/gateway-technical.md)
 
 ## Overview
 
