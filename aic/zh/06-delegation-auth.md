@@ -86,14 +86,29 @@ DelegationAuthTBS ::= SEQUENCE {
 ## 验证流程（CA 签发阶段）
 
 ```
-① 验证 DelegationAuthTBS.timestamp 新鲜度（|now - timestamp| ≤ 30s）
+① 验证 DelegationAuthTBS.timestamp 新鲜度（|now - timestamp| ≤ da_max_timestamp_skew，出厂默认 1m）
 ② 验证 nonce 唯一性（CA 持久化已用 nonce，拒绝重复）
 ③ 用主体公钥验签 delegationAuthorization.signatureValue
 ④ 确认 capabilities 为 PrincipalAuthorization.grants 的能力级子集，且每条 capability 的 parameters 不超出对应 grant 的 parameters 边界（参数级子集，如有 PrincipalAuthorization）；越界即拒绝签发
 ⑤ 设置证书 NotAfter = now + requestedLifetime（授权有效期 = 证书有效期）
 ```
 
-> **① timestamp 新鲜度已实现（P1-B-13）**：`POST /api/v1/certs`（agent-proxy 分支）与 `POST /api/v1/aic/issue` 在签发前校验 `|now - timestamp| ≤ da_max_timestamp_skew`（默认 30s，配置项 `serve.da_max_timestamp_skew`，设为 `"0"` 禁用）。与 ② nonce 唯一性共同构成说明书的"短时间窗口第二道防线"——DA 签名后拖延太久才提交签发（重放/盗签）即拒绝（403 `api.da_timestamp_stale`）。
+> **① timestamp 新鲜度已实现（P1-B-13）**：`POST /api/v1/certs`（agent-proxy 分支）与 `POST /api/v1/aic/issue` 在签发前校验 `|now - timestamp| ≤ da_max_timestamp_skew`（配置项 `serve.da_max_timestamp_skew`）。与 ② nonce 唯一性共同构成说明书的"短时间窗口第二道防线"——DA 签名后拖延太久才提交签发（重放/盗签）即拒绝（403 `api.da_timestamp_stale`）。**出厂默认 1m**，规范建议下界 30s，取值与理由见下。
+
+> ### ⚠️ 安全须知：DA 时间窗（da_max_timestamp_skew）
+>
+> 本参数的值**直接等于"一份被签出的 DA 可被重放的时间跨度"**，是继 nonce 一次性之后的第二道防线。取值需按下面的边界来定，不要随意放宽：
+>
+> - **规范建议下界 30s**；出厂默认放宽到 **1m**，唯一理由是让"人工异步审批"通过后 agent 仍有时间兑换 DA。30s 对人工审批链路偏紧（审批通过后 agent 需轮询取回并立即提交签发）。
+> - **每加一秒都是攻击面**：窗口内任何获得 DA 的一方，只要抢在 nonce 被记账之前，就能把它用在另一个签发请求上。窗口越长，这个抢先的机会越大。
+> - **禁止设为 `"0"`**：那样会完全关闭本检查，DA 变为永久可重放，只剩 nonce 唯一性这一道单点防御。
+> - **三个时间参数互不替代，不要混用**：
+>   | 参数 | 默认 | 约束的是 |
+>   |---|---|---|
+>   | `aic_request_ttl`（user-signer） | 30m | 人工审批能等多久（排队时长） |
+>   | `da_max_timestamp_skew`（core） | **1m** | DA 签出后多久内必须被兑换 |
+>   | `requested_lifetime`（DA 内） | 3600s | 会话能活多久（决定 AIC 证书 NotAfter） |
+> - DA 的 `timestamp` 由 user-signer 在**审批通过的那一刻**盖章，因此人工排队等待**不消耗**本窗口；但审批通过后 agent 必须在此窗口内完成兑换。
 
 ## 验证流程（网关运行时）
 
@@ -109,7 +124,7 @@ DelegationAuthTBS ::= SEQUENCE {
 
 > **网关不检查 timestamp 新鲜度和 Lifetime 过期**。CA 签发时已将 NotAfter 严格设为 `timestamp + requestedLifetime`，网关只需依赖标准 X.509 有效期检查（NotAfter）即完成生命周期校验。
 >
-> **可选加固（P1-B-13）**：`gateway-core` 的 `AdmissionConfig.CheckDAAge`（默认 false）+ `DAAgeMax`（默认 30s）可为需要更严格时间窗口的部署开启网关侧 DA timestamp 新鲜度校验；lib 同时提供 `CheckDAFreshness` 独立 helper。默认关闭以保持与上段设计一致。
+> **可选加固（P1-B-13）**：`gateway-core` 的 `AdmissionConfig.CheckDAAge`（默认 false）+ `DAAgeMax`（默认 1m，与 core 的 `serve.da_max_timestamp_skew` 保持一致）可为需要更严格时间窗口的部署开启网关侧 DA timestamp 新鲜度校验；lib 同时提供 `CheckDAFreshness` 独立 helper。默认关闭以保持与上段设计一致。
 
 > **主体证书链与吊销**：第③步的主体证书链验证及吊销检查（OCSP/CRL）MUST 由网关在调用 `VerifyDelegationAuth` 之前完成；`VerifyDelegationAuth` 仅负责验签与 SPKI 交叉校验。离线模式跳过在线吊销检查时 MUST 记录高风险审计（参见 `03-validation.md` §验证顺序）。
 

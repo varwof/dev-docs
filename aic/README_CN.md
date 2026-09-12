@@ -80,6 +80,7 @@ AIC（Agent Identity Certificate）是一套基于 X.509 v3 证书扩展的 AI A
 |------|------|
 | [13-revision-history.md](zh/13-revision-history.md) | 变更日志（v1.0 → v1.8） |
 | [14-version-governance.md](zh/14-version-governance.md) | 版本治理策略（冻结/发布流程） |
+| [15-e2e-runbook.md](zh/15-e2e-runbook.md) | AIC 端到端运行手册（core → PKI → 用户证书 → AIC 签发 → 消费）+ 缺口清单 |
 
 ## OID 树
 

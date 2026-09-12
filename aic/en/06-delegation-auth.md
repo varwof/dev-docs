@@ -86,7 +86,7 @@ DelegationAuthTBS ::= SEQUENCE {
 ## Verification Flow (CA Issuance Phase)
 
 ```
-① Verify DelegationAuthTBS.timestamp freshness (|now - timestamp| ≤ 30s)
+① Verify DelegationAuthTBS.timestamp freshness (|now - timestamp| ≤ da_max_timestamp_skew, shipped default 1m)
 ② Verify nonce uniqueness (CA persists used nonces, reject duplicates)
 ③ Verify delegationAuthorization.signatureValue with principal public key
 ④ Confirm capabilities are a capability-level subset of PrincipalAuthorization.grants,
@@ -95,7 +95,22 @@ DelegationAuthTBS ::= SEQUENCE {
 ⑤ Set certificate NotAfter = now + requestedLifetime (authorization validity = certificate validity)
 ```
 
-> **① timestamp freshness already implemented (P1-B-13)**: `POST /api/v1/certs` (agent-proxy branch) and `POST /api/v1/aic/issue` validate `|now - timestamp| ≤ da_max_timestamp_skew` before issuance (default 30s, configurable, `"0"` to disable). Together with ② nonce uniqueness, forms the specification's "second line of defense in a short time window" — DA signed but submitted for issuance too late (replay/theft of signature) is rejected (403 `api.da_timestamp_stale`).
+> **① timestamp freshness already implemented (P1-B-13)**: `POST /api/v1/certs` (agent-proxy branch) and `POST /api/v1/aic/issue` validate `|now - timestamp| ≤ da_max_timestamp_skew` before issuance (configurable via `serve.da_max_timestamp_skew`). Together with ② nonce uniqueness, forms the specification's "second line of defense in a short time window" — DA signed but submitted for issuance too late (replay/theft of signature) is rejected (403 `api.da_timestamp_stale`). **The shipped default is 1m**; the specification's recommended lower bound is 30s. See the security note below.
+
+> ### ⚠️ Security note: the DA freshness window (da_max_timestamp_skew)
+>
+> This value **is exactly the span in which a signed DA can be replayed**. It is the second line of defense, after nonce single-use. Tune it against these boundaries; do not widen it casually:
+>
+> - **Specification recommends 30s as the lower bound**; the shipped default is **1m**, solely so an asynchronously approved DA still leaves the agent time to redeem it. 30s is tight for a human-approval path (the agent must poll, fetch and submit promptly after approval).
+> - **Every extra second is attack surface**: within the window, anyone holding the DA can win the race against the nonce record and use it on a different issuance request.
+> - **Never set it to `"0"`**: that disables the check entirely, making the DA replayable forever and leaving nonce single-use as the only defense.
+> - **The three time parameters are independent — do not conflate them**:
+>   | Parameter | Default | Constrains |
+>   |---|---|---|
+>   | `aic_request_ttl` (user-signer) | 30m | how long a human may take to approve (queue wait) |
+>   | `da_max_timestamp_skew` (core) | **1m** | how long after signing a DA may still be redeemed |
+>   | `requested_lifetime` (inside the DA) | 3600s | how long the session lives (drives the AIC NotAfter) |
+> - user-signer stamps the DA `timestamp` at the **moment of approval**, so waiting in the queue does **not** consume this window — but the agent must redeem the DA within it once approved.
 
 ## Verification Flow (Gateway Runtime)
 
@@ -113,7 +128,7 @@ See `gateway-core/decision.go:VerifyDelegationAuth`:
 
 > **The gateway does not check timestamp freshness or Lifetime expiration**. During CA issuance, NotAfter is strictly set to `timestamp + requestedLifetime`; the gateway only needs to rely on standard X.509 validity checking (NotAfter) to complete lifecycle verification.
 >
-> **Optional hardening (P1-B-13)**: `gateway-core`'s `AdmissionConfig.CheckDAAge` (default false) + `DAAgeMax` (default 30s) can enable gateway-side DA timestamp freshness verification for deployments requiring stricter time windows; lib also provides a standalone `CheckDAFreshness` helper. Disabled by default to maintain consistency with the above design.
+> **Optional hardening (P1-B-13)**: `gateway-core`'s `AdmissionConfig.CheckDAAge` (default false) + `DAAgeMax` (default 1m, kept in step with core's `serve.da_max_timestamp_skew`) can enable gateway-side DA timestamp freshness verification for deployments requiring stricter time windows; lib also provides a standalone `CheckDAFreshness` helper. Disabled by default to maintain consistency with the above design.
 >
 > **Principal certificate chain and revocation**: The principal certificate chain verification and revocation check (OCSP/CRL) at step ③ MUST be completed by the gateway before calling `VerifyDelegationAuth`; `VerifyDelegationAuth` is only responsible for signature verification and SPKI cross-check. When offline mode skips online revocation checks, high-risk audit MUST be logged (see `03-validation.md` §Verification Sequence).
 
